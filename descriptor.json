@@ -1,0 +1,111 @@
+{
+  "name" : "BIQTIris",
+  "description": "Reference iris image quality algorithm limited to 640x480 and 480x480 images.",
+  "version" : "0.1",
+  "sourceLanguage" : "c++",
+  "modality": "iris",
+  "attributes": [
+    {
+      "name": "quality",
+      "description": "Measure of the quality of the iris image.",
+      "type": "DOUBLE",
+      "defaultValue": "0"
+    },
+    {
+      "name": "sharpness",
+      "description": "Raw score quantifying the sharpness of the image.",
+      "type": "DOUBLE",
+      "defaultValue": "0"
+    },
+    {
+      "name": "normalized_sharpness",
+      "description": "Normalized [0,1] score quantifying the sharpness of the image.",
+      "type": "DOUBLE",
+      "defaultValue": "0"
+    },
+    {
+      "name": "contrast",
+      "description": "Raw score quantifying overall image contrast.",
+      "type": "DOUBLE",
+      "defaultValue": "0"
+    },
+    {
+      "name": "normalized_contrast",
+      "description": "Normalized [0,1] score quantifying overall image contrast.",
+      "type": "DOUBLE",
+      "defaultValue": "0"
+    },
+    {
+      "name": "iris_pupil_gs",
+      "description": "Measure of the grayscale difference between the iris and pupil.",
+      "type": "DOUBLE",
+      "defaultValue": "0"
+    },
+    {
+      "name": "normalized_iris_sclera_gs",
+      "description": "Normalized measure of the grayscale difference between the iris and pupil, used in quality computations.",
+      "type": "DOUBLE",
+      "defaultValue": "0"
+    },
+    {
+      "name": "iris_sclera_gs",
+      "description": "Raw measure quantifying how distinguishable the boundary is between the iris and the sclera.",
+      "type": "DOUBLE",
+      "defaultValue": "0"
+    },
+    {
+      "name": "normalized_iris_sclera_gs",
+      "description": "Normalized [0,1] measure quantifying how distinguishable the boundary is between the iris and the sclera.",
+      "type": "DOUBLE",
+      "defaultValue": "0"
+    },
+    {
+      "name": "iris_diameter",
+      "description": "Raw diameter of the iris measured in pixels.",
+      "type": "DOUBLE",
+      "defaultValue": "0"
+    },
+    {
+      "name": "normalized_iris_diameter",
+      "description": "Normalized [0,1] value measuring how large the iris is relative the image.",
+      "type": "DOUBLE",
+      "defaultValue": "0"
+    },
+    {
+      "name": "normalized_percent_visible_iris",
+      "description": "Normalized percent of the iris which is visible (not obscured by the eyelid, lashes, etc.), used in quality comptuatioins",
+      "type": "DOUBLE",
+      "defaultValue": "0"
+    },
+    {
+      "name": "percent_visible_iris",
+      "description": "Percent of the iris which is visible (not obscured by the eyelid, lashes, etc.)",
+      "type": "DOUBLE",
+      "defaultValue": "0"
+    },
+    {
+      "name": "image_width",
+      "description": "Width, in pixels, of the image.",
+      "type": "DOUBLE",
+      "defaultValue": "0"
+    },
+    {
+      "name": "image_height",
+      "description": "Height, in pixels, of the image.",
+      "type": "DOUBLE",
+      "defaultValue": "0"
+    },
+    {
+      "name": "iris_center_x",
+      "description": "X-coordinate of the iris center.",
+      "type": "DOUBLE",
+      "defaultValue": "0"
+    },
+    {
+      "name": "iris_center_y",
+      "description": "Y-coordinate of the iris center.",
+      "type": "DOUBLE",
+      "defaultValue": "0"
+    }
+  ]
+}

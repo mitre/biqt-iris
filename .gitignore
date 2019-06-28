@@ -1,0 +1,9 @@
+*.o
+*.so
+*.dll
+*.dylib
+*.lib
+build
+target
+.idea
+cmake-build-debug

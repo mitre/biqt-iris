@@ -1,0 +1,7 @@
+if(WIN32)  
+  foreach(OPENCV_DLL ${OpenCV_LIBS})
+    file(TO_CMAKE_PATH ${_OpenCV_LIB_PATH} OPENCV_DLLS_PATH)
+    file(GLOB OPENCV_DLLS "${OPENCV_DLLS_PATH}/${OPENCV_DLL}*")
+    list(APPEND DEPENDENCY_DLLS ${OPENCV_DLLS})
+  endforeach()
+endif()
