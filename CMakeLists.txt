@@ -5,7 +5,7 @@
 # under contract, and is subject to the Rights in Data-General Clause
 # 52.227-14, Alt. IV (DEC 2007).
 #
-# Copyright 2019 The MITRE Corporation. All Rights Reserved.
+# Copyright 2022 The MITRE Corporation. All Rights Reserved.
 # ####################################################################### 
 
 cmake_minimum_required(VERSION 3.1)
@@ -80,9 +80,9 @@ set(CPACK_PACKAGE_VERSION ${VERSION})
 set(CPACK_GENERATOR "RPM")
 set(CPACK_PACKAGE_NAME "biqt-iris")
 set(CPACK_PACKAGE_VERSION_MAJOR 0)
-set(CPACK_PACKAGE_VERSION_MINOR 1)
+set(CPACK_PACKAGE_VERSION_MINOR 3)
 set(CPACK_PACKAGE_VERSION_PATCH 0)
-set(CPACK_PACKAGE_VERSION 0.1)
+set(CPACK_PACKAGE_VERSION 0.3)
 set(CPACK_PACKAGE_RELEASE 1)
 set(CPACK_PACKAGE_CONTACT "MITRE Corporation")
 set(CPACK_PACKAGE_VENDOR "MITRE Corporation")

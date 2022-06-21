@@ -6,4 +6,5 @@
 build
 target
 .idea
+.vscode
 cmake-build-debug

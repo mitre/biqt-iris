@@ -1,110 +1,182 @@
 {
   "name" : "BIQTIris",
   "description": "Reference iris image quality algorithm limited to 640x480 and 480x480 images.",
-  "version" : "0.1",
+  "version" : "0.3",
   "sourceLanguage" : "c++",
   "modality": "iris",
   "attributes": [
     {
-      "name": "quality",
-      "description": "Measure of the quality of the iris image.",
-      "type": "DOUBLE",
-      "defaultValue": "0"
-    },
-    {
-      "name": "sharpness",
-      "description": "Raw score quantifying the sharpness of the image.",
-      "type": "DOUBLE",
-      "defaultValue": "0"
-    },
-    {
-      "name": "normalized_sharpness",
-      "description": "Normalized [0,1] score quantifying the sharpness of the image.",
-      "type": "DOUBLE",
-      "defaultValue": "0"
-    },
-    {
       "name": "contrast",
       "description": "Raw score quantifying overall image contrast.",
-      "type": "DOUBLE",
-      "defaultValue": "0"
-    },
-    {
-      "name": "normalized_contrast",
-      "description": "Normalized [0,1] score quantifying overall image contrast.",
-      "type": "DOUBLE",
-      "defaultValue": "0"
-    },
-    {
-      "name": "iris_pupil_gs",
-      "description": "Measure of the grayscale difference between the iris and pupil.",
-      "type": "DOUBLE",
-      "defaultValue": "0"
-    },
-    {
-      "name": "normalized_iris_sclera_gs",
-      "description": "Normalized measure of the grayscale difference between the iris and pupil, used in quality computations.",
-      "type": "DOUBLE",
-      "defaultValue": "0"
-    },
-    {
-      "name": "iris_sclera_gs",
-      "description": "Raw measure quantifying how distinguishable the boundary is between the iris and the sclera.",
-      "type": "DOUBLE",
-      "defaultValue": "0"
-    },
-    {
-      "name": "normalized_iris_sclera_gs",
-      "description": "Normalized [0,1] measure quantifying how distinguishable the boundary is between the iris and the sclera.",
-      "type": "DOUBLE",
+      "type": "INT",
       "defaultValue": "0"
     },
     {
       "name": "iris_diameter",
       "description": "Raw diameter of the iris measured in pixels.",
-      "type": "DOUBLE",
+      "type": "INT",
       "defaultValue": "0"
+    },
+    {
+      "name": "iris_pupil_gs",
+      "description": "Raw measure quantifying how distinguishable the boundary is between the pupil and the iris.",
+      "type": "FLOAT",
+      "defaultValue": "0.0"
+    },
+    {
+      "name": "iris_sclera_gs",
+      "description": "Raw measure quantifying how distinguishable the boundary is between the iris and the sclera.",
+      "type": "DOUBLE",
+      "defaultValue": "0.0"
+    },
+    {
+      "name": "pupil_circularity_avg_deviation",
+      "description": "Average deviation for the dimensionless pupil radii at corresponding angle segments.",
+      "type": "DOUBLE",
+      "defaultValue": "0.0"
+    },
+    {
+      "name": "pupil_diameter",
+      "description": "Raw diameter of the pupil measured in pixels.",
+      "type": "INT",
+      "defaultValue": "0"
+    },
+    {
+      "name": "quality",
+      "description": "An overall quality score that leverages several statistics together.",
+      "type": "DOUBLE",
+      "defaultValue": "0.0"
+    },
+    {
+      "name": "sharpness",
+      "description": "Raw score quantifying the sharpness of the image.",
+      "type": "INT",
+      "defaultValue": "0"
+    },
+    {
+      "name": "iso_greyscale_utilization",
+      "description": "The spread of intensity values regarding the pixel values within the iris portion of the image.",
+      "type": "DOUBLE",
+      "defaultValue": "0.0"
+    },
+    {
+      "name": "iso_iris_pupil_concentricity",
+      "description": "The degree to which the pupil centre and the iris centre are in the same location.",
+      "type": "DOUBLE",
+      "defaultValue": "0.0"
+    },
+    {
+      "name": "iso_iris_sclera_contrast",
+      "description": "The image characteristics at the boundary between the iris region and the sclera.",
+      "type": "FLOAT",
+      "defaultValue": "0.0"
+    },
+    {
+      "name": "iso_margin_adequacy",
+      "description": "The degree to which the iris portion of the image is centred relative to the edges of the entire image.",
+      "type": "DOUBLE",
+      "defaultValue": "0.0"
+    },
+    {
+      "name": "iso_pupil_boundary_circularity",
+      "description": "The circularity of the iris-pupil boundary.",
+      "type": "DOUBLE",
+      "defaultValue": "0.0"
+    },
+    {
+      "name": "iso_pupil_iris_contrast",
+      "description": "The image characteristics at the boundary between the iris region and the pupil.",
+      "type": "FLOAT",
+      "defaultValue": "0.0"
+    },
+    {
+      "name": "iso_pupil_iris_ratio",
+      "description": "The degree to which the pupil is dilated or constricted.",
+      "type": "DOUBLE",
+      "defaultValue": "0.0"
+    },
+    {
+      "name": "iso_sharpness",
+      "description": "The degree of focus present in the image.",
+      "type": "DOUBLE",
+      "defaultValue": "0.0"
+    },
+    {
+      "name": "iso_usable_iris_area",
+      "description": "The fraction of the iris portion of the image that is not occluded by eyelids, eyelashes, or specular reflections.",
+      "type": "INT",
+      "defaultValue": "0"
+    },
+    {
+      "name": "normalized_contrast",
+      "description": "Normalized value for 'contrast'.",
+      "type": "FLOAT",
+      "defaultValue": "0.0"
     },
     {
       "name": "normalized_iris_diameter",
-      "description": "Normalized [0,1] value measuring how large the iris is relative the image.",
-      "type": "DOUBLE",
-      "defaultValue": "0"
+      "description": "Normalized value for 'iris_diameter'.",
+      "type": "FLOAT",
+      "defaultValue": "0.0"
     },
     {
-      "name": "normalized_percent_visible_iris",
-      "description": "Normalized percent of the iris which is visible (not obscured by the eyelid, lashes, etc.), used in quality comptuatioins",
-      "type": "DOUBLE",
-      "defaultValue": "0"
+      "name": "normalized_iris_pupil_gs",
+      "description": "Normalized value for 'iris_pupil_gs'.",
+      "type": "FLOAT",
+      "defaultValue": "0.0"
     },
     {
-      "name": "percent_visible_iris",
-      "description": "Percent of the iris which is visible (not obscured by the eyelid, lashes, etc.)",
-      "type": "DOUBLE",
+      "name": "normalized_iris_sclera_gs",
+      "description": "Normalized value for 'iris_sclera_gs'.",
+      "type": "FLOAT",
+      "defaultValue": "0.0"
+    },
+    {
+      "name": "normalized_iso_usable_iris_area",
+      "description": "Normalized value for 'iso_usable_iris_area'.",
+      "type": "FLOAT",
+      "defaultValue": "0.0"
+    },
+    {
+      "name": "normalized_sharpness",
+      "description": "Normalized value for 'sharpness'.",
+      "type": "FLOAT",
+      "defaultValue": "0.0"
+    },
+    {
+      "name": "image_height",
+      "description": "Image height measured in pixels.",
+      "type": "INT",
       "defaultValue": "0"
     },
     {
       "name": "image_width",
-      "description": "Width, in pixels, of the image.",
-      "type": "DOUBLE",
-      "defaultValue": "0"
-    },
-    {
-      "name": "image_height",
-      "description": "Height, in pixels, of the image.",
-      "type": "DOUBLE",
+      "description": "Image width measured in pixels.",
+      "type": "INT",
       "defaultValue": "0"
     },
     {
       "name": "iris_center_x",
-      "description": "X-coordinate of the iris center.",
-      "type": "DOUBLE",
+      "description": "The x-coordinate of the iris center in the image.",
+      "type": "INT",
       "defaultValue": "0"
     },
     {
       "name": "iris_center_y",
-      "description": "Y-coordinate of the iris center.",
-      "type": "DOUBLE",
+      "description": "The y-coordinate of the iris center in the image.",
+      "type": "INT",
+      "defaultValue": "0"
+    },
+    {
+      "name": "pupil_center_x",
+      "description": "The x-coordinate of the pupil center in the image.",
+      "type": "INT",
+      "defaultValue": "0"
+    },
+    {
+      "name": "pupil_center_y",
+      "description": "The y-coordinate of the pupil center in the image.",
+      "type": "INT",
       "defaultValue": "0"
     }
   ]
