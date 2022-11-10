@@ -47,7 +47,6 @@ class IMAGEOPS_EXPORT MFilter {
   int GetQualityFromImageFrame(const uint8_t *frame_bytes, int width, int height);
 
   // Quality Attributes
-  int GetOverallQuality();
   int GetContrastScore();
   int GetDefocusScore();
 
@@ -77,6 +76,15 @@ class IMAGEOPS_EXPORT MFilter {
   double GetISOIPConcentricity();
   double GetISOMarginAdequacy();
   double GetISOSharpness();
+  double GetNormalizedISOIrisScleraContrast();
+  double GetNormalizedISOPupilIrisContrast();
+  double GetNormalizedISOGreyscaleUtilization();
+  double GetNormalizedISOPIRatio();
+  double GetNormalizedISOIPConcentricity();
+  double GetNormalizedISOIrisDiameter();
+  double GetNormalizedISOMarginAdequacy();
+  double GetNormalizedISOSharpness();
+  int GetIsoOverallQuality();
 
   // Features
   int GetIrisCenterX();
@@ -98,6 +106,11 @@ class IMAGEOPS_EXPORT MFilter {
                          int isgs_mean, double margin, int iris_d,
                          double iris_vis, double ipgs_diff,
                          double pupil_iris_ratio);
+
+  int Calc_ISO_Overall_Quality(double n_iso_sharpness_value_, double n_iso_greyscale_value_,
+                                 double n_iso_ip_concentricity_value_, double n_iso_iris_sclera_contrast_value_,
+                                 double n_iso_margin_adequacy_value_, double n_iso_pupil_iris_contrast_value_,
+                                 double n_iso_iris_pupil_ratio_value_);
   int GetQuality(double n_contrast, double n_defocus, double n_iris_d,
                  double n_isgs_mean, double n_iris_vis, double n_margin,
                  double n_pupil_iris_ratio, double n_ipgs_diff);
@@ -167,6 +180,7 @@ class IMAGEOPS_EXPORT MFilter {
   int pupil_center_y_;
   int pupil_radius_;
   int overall_quality_;
+  int iso_overall_quality_;
   int defocus_score_;
   int contrast_score_;
   int usable_iris_area_percent_;
@@ -184,6 +198,16 @@ class IMAGEOPS_EXPORT MFilter {
   double iso_ip_concentricity_value_;
   double iso_margin_adequacy_value_;
   double iso_sharpness_value_;
+  double n_iso_iris_sclera_contrast_value_;
+  double n_iso_pupil_iris_contrast_value_;
+  double n_iso_iris_pupil_ratio_value_;
+  double n_iso_pupil_boundary_circularity_value_;
+  double n_iso_greyscale_value_;
+  double n_iso_ip_concentricity_value_;
+  double n_iso_margin_adequacy_value_;
+  double n_iso_sharpness_value_;
+  double n_iso_usable_iris_area_value_;
+  double n_iso_iris_diameter_value_;
   double n_contrast_;
   double n_defocus_;
   double n_iris_id_;
@@ -240,8 +264,6 @@ class IMAGEOPS_EXPORT MFilter {
   unsigned char **vert_edge_bin_;
 };
 
-inline int MFilter::GetOverallQuality() { return overall_quality_; }
-
 inline int MFilter::GetContrastScore() { return contrast_score_; }
 
 inline int MFilter::GetDefocusScore() { return defocus_score_; }
@@ -285,6 +307,24 @@ inline double MFilter::GetISOIPConcentricity() { return iso_ip_concentricity_val
 inline double MFilter::GetISOMarginAdequacy() { return iso_margin_adequacy_value_; }
 
 inline double MFilter::GetISOSharpness() { return iso_sharpness_value_; }
+
+inline double MFilter::GetNormalizedISOSharpness() { return n_iso_sharpness_value_; }
+
+inline double MFilter::GetNormalizedISOGreyscaleUtilization() { return n_iso_greyscale_value_; }
+
+inline double MFilter::GetNormalizedISOIPConcentricity() { return n_iso_ip_concentricity_value_; }
+
+inline double MFilter::GetNormalizedISOIrisDiameter() { return n_iso_iris_diameter_value_; }
+
+inline double MFilter::GetNormalizedISOIrisScleraContrast() { return n_iso_iris_sclera_contrast_value_; }
+
+inline double MFilter::GetNormalizedISOMarginAdequacy() { return n_iso_margin_adequacy_value_; }
+
+inline double MFilter::GetNormalizedISOPupilIrisContrast() { return n_iso_pupil_iris_contrast_value_; }
+
+inline double MFilter::GetNormalizedISOPIRatio() { return n_iso_iris_pupil_ratio_value_; }
+
+inline int MFilter::GetIsoOverallQuality() { return iso_overall_quality_; }
 
 inline int MFilter::GetIrisCenterX() { return iris_center_x_; }
 

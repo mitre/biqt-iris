@@ -40,12 +40,13 @@ The following quality metrics are reported by this provider:
 
 NEW! The following ISO metrics are reported by this provider (please refer to ISO/IEC 29794-6:2015 [Information technology — Biometric sample quality — Part 6: Iris image data] documentation for more information):
 
+  * `iso_overall_quality` _value range: [0, 100)_ - The overall ISO quality score based on the product of normalized individual iso metrics.
   * `iso_greyscale_utilization` _value range: [0, +inf), recommended value: 6 or greater_ - The spread of intensity values regarding the pixel values within the iris portion of the image.
   * `iso_iris_pupil_concentricity` _value range: [0, 100], recommended value: 90 or greater_ - The degree to which the pupil centre and the iris centre are in the same location.
   * `iso_iris_sclera_contrast` _value range: [0, 100), recommended value: greater than 5_ - The image characteristics at the boundary between the iris region and the sclera.
   * `iso_margin_adequacy` _value range: [0, 100], recommended value: greater than 80_ - The degree to which the iris portion of the image is centred relative to the edges of the entire image.
   * `iso_pupil_boundary_circularity` _value range: [0, 100]_ - The circularity of the iris-pupil boundary.
-  * `iso_pupil_iris_contrast` _value range: [0, 100), recommended value: 30 or greater_ - The image characteristics at the boundary between the iris region and the pupil.
+  * `iso_iris_pupil_contrast` _value range: [0, 100), recommended value: 30 or greater_ - The image characteristics at the boundary between the iris region and the pupil.
   * `iso_pupil_iris_ratio` _value range: (9.58, 121.30), recommended value: between 20 and 70_ - The degree to which the pupil is dilated or constricted.
   * `iso_sharpness` _value range: [0, 100)_ - The degree of focus present in the image.
   * `iso_usable_iris_area` _value range: [0, 100]_ - The fraction of the iris portion of the image that is not occluded by eyelids, eyelashes, or specular reflections.
@@ -56,5 +57,15 @@ The following normalized statistics are also reported by this provider:
   * `normalized_iris_diameter` _value range: [0, 1]_ - Normalized value for `iris_diameter`.
   * `normalized_iris_pupil_gs` _value range: [0, 1]_ - Normalized value for `iris_pupil_gs`.
   * `normalized_iris_sclera_gs` _value range: [0, 1]_ - Normalized value for `iris_sclera_gs`.
-  * `normalized_iso_usable_iris_area` _value range: [0, 1]_ - Normalized value for `iso_usable_iris_area`.
   * `normalized_sharpness` _value range: [0, 1]_ - Normalized value for `sharpness`.
+
+NEW! The following ISO normalized statistics are also reported by this provider 
+  * `normalized_iso_greyscale_utilization` _value range: [0, 1]_ - Normalized value for `iso_greyscale_utilization`.
+  * `normalized_iso_iris_diameter` _value range: [0, 1]_ - Normalized value for `iris_diameter`.
+  * `normalized_iso_iris_pupil_concentricity` _value range: [0, 1]_ - Normalized value for `iso_iris_pupil_concentricity`.
+  * `normalized_iso_pupil_iris_ratio` _value range: [0, 1]_ - Normalized value for `iso_iris_pupil_ratio`.
+  * `normalized_iso_iris_sclera_contrast` _value range: [0, 1]_ - Normalized value for `iso_iris_sclera_contrast`.
+  * `normalized_iso_margin_adequacy` _value range: [0, 1]_ - Normalized value for `iso_margin_adequacy`.
+  * `normalized_iso_iris_pupil_contrast` _value range: [0, 1]_ - Normalized value for `iso_pupil_iris_contrast`.
+  * `normalized_iso_sharpness` _value range: [0, 1]_ - Normalized value for `iso_sharpness`.
+  * `normalized_iso_usable_iris_area` _value range: [0, 1]_ - Normalized value for `iso_usable_iris_area`.

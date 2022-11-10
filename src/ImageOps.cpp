@@ -26,7 +26,11 @@ MFilter::MFilter()
       max_r_trial_(42), min_p_r_trial_(8), max_p_r_trial_(32), pupil_cx_(0), pupil_cy_(0),
       pupil_rad_(5), pupil_d_(10), contrast_score_(0),
       overall_margin_(1.0), isgs_diff_mean_avg_(0.0),
-      iris_pupil_gs_diff_(0.0), max_point_response_(1000), pupil_circularity_avg_deviation_(0.0) {
+      iris_pupil_gs_diff_(0.0), max_point_response_(1000), pupil_circularity_avg_deviation_(0.0),
+      n_iso_sharpness_value_(1.0), n_iso_greyscale_value_(1.0),
+      n_iso_margin_adequacy_value_(1.0), n_iso_pupil_iris_contrast_value_(1.0), n_iso_iris_pupil_ratio_value_(1.0) ,
+      n_iso_ip_concentricity_value_(1.0), n_iso_iris_sclera_contrast_value_(1.0), iso_overall_quality_(100){
+
   cos = new int[101];
 
   isgs_vals_ = new int[256];
@@ -95,6 +99,11 @@ int MFilter::GetQualityFromImageFrame(const uint8_t *frame_bytes, int width, int
     overall_quality = CalcOverallQuality(contrast_score_, defocus_score_, (int) isgs_diff_mean_avg_,
                                          overall_margin_, iris_radius_ * 2, iris_vis,
                                          iris_pupil_gs_diff_, pupil_iris_diameter_ratio_);
+
+    iso_overall_quality_ = Calc_ISO_Overall_Quality(n_iso_sharpness_value_, n_iso_greyscale_value_,
+                                                    n_iso_ip_concentricity_value_, n_iso_iris_sclera_contrast_value_,
+                                                    n_iso_margin_adequacy_value_, n_iso_pupil_iris_contrast_value_,
+                                                    n_iso_iris_pupil_ratio_value_);
   } catch (std::exception &ex) {
     std::cerr << "exception caught: " << ex.what() << std::endl;
   }
@@ -233,6 +242,19 @@ int MFilter::CalcOverallQuality(int contrast, int defocus,
   // Finally Scale the combined_quality_ output metric
   return overall_quality_;
 }
+
+int MFilter::Calc_ISO_Overall_Quality(double n_iso_sharpness_value, double n_iso_greyscale_value, double n_iso_ip_concentricity_value, double  n_iso_iris_sclera_contrast_value,
+                                      double n_iso_margin_adequacy_value, double n_iso_pupil_iris_contrast_value, double n_iso_iris_pupil_ratio_value) {
+    double iso_overall_quality = 0.0;
+    int iso_overall_quality_100 = 0;
+
+
+    iso_overall_quality = n_iso_greyscale_value * n_iso_iris_sclera_contrast_value * n_iso_margin_adequacy_value *
+                          n_iso_pupil_iris_contrast_value * n_iso_ip_concentricity_value;
+    iso_overall_quality_100 = 100 * iso_overall_quality;
+    return iso_overall_quality_100;
+}
+
 
 int MFilter::GetQuality(double n_contrast, double n_defocus, double n_iris_d,
                         double n_isgs_mean, double n_iris_vis, double n_margin,
@@ -583,6 +605,27 @@ void MFilter::ISOContrast(const uint8_t *raw_img, const int width, const int hei
     // Limit the lower boundary of iso_iris_sclera_contrast_value_ to 0.
     iso_iris_sclera_contrast_value_ = 0.0;
   }
+  
+  n_iso_iris_sclera_contrast_value_ = 1.0;
+  // calculate a normalized iso_iris_sclera_contrast value
+  n_iso_iris_sclera_contrast_value_ = 1.0;
+  // Default to 1.0;
+  // Set limits for proportional value calculation
+  // lower proportional limit is set to approximately lowest 2% of operational test set values
+  // upper proportional limit is set to approximately lowest 5% of operational test set values
+  double lpl_iso_iris_sclera_contrast = 0.0;
+  // Substitute lower proportional limit below for stricter limits
+  // double lpl_iso_iris_sclera_contrast = 50.0;
+  double upl_iso_iris_sclera_contrast = 15.0;
+  if (iso_iris_sclera_contrast_value_ < lpl_iso_iris_sclera_contrast){
+      n_iso_iris_sclera_contrast_value_= 0.0;
+  }
+  if (iso_iris_sclera_contrast_value_ >= upl_iso_iris_sclera_contrast){
+      n_iso_iris_sclera_contrast_value_= 1.0;
+  }
+  if (iso_iris_sclera_contrast_value_ >= lpl_iso_iris_sclera_contrast && iso_iris_sclera_contrast_value_ <= upl_iso_iris_sclera_contrast){
+      n_iso_iris_sclera_contrast_value_= (iso_iris_sclera_contrast_value_ - lpl_iso_iris_sclera_contrast)/(upl_iso_iris_sclera_contrast - lpl_iso_iris_sclera_contrast);
+  }
 
   // now calculate the pupil/iris contrast
   // we already have the pupil values, so just recalculate the iris ones.
@@ -745,7 +788,7 @@ void MFilter::ISOIrisPupilConcentricity() {
 void MFilter::ISOMarginAdequacy(int width, int height) {
   if (iris_radius_ == 0 || pupil_rad_ == 0) {
     iso_margin_adequacy_value_ = 0.0;
-
+    n_iso_margin_adequacy_value_ = 0.0;
     return;
   }
 
@@ -784,6 +827,11 @@ void MFilter::ISOMarginAdequacy(int width, int height) {
   // Limit the upper boundary of reported iso_margin_adequacy_value to 100.
   if (iso_margin_adequacy_value_ > 100.0) {
     iso_margin_adequacy_value_ = 100.0;
+  }
+  n_iso_margin_adequacy_value_ = 1.0;
+  
+  if (iso_margin_adequacy_value_ < 80) {
+    n_iso_margin_adequacy_value_ = 0.0;
   }
 }
 
@@ -1109,10 +1157,16 @@ void MFilter::FindFineIris(uint8_t **raw_bytes, int width, int height, int rough
   int i_c_x = iris_center_x_;
   int i_c_y = iris_center_y_;
   int i_radius = iris_radius_;
+  n_iso_iris_diameter_value_ = 1.0;
+  if (iris_radius_ < 25) {
+    n_iso_iris_diameter_value_ = 0.0;
+  }
   if (iris_radius_ > max_radius_ - 16) {
+    n_iso_iris_diameter_value_ = 0.0;
     throw new std::out_of_range("Iris Radius exceeds max allowable");
   }
   if (iris_radius_ < 17) {
+    n_iso_iris_diameter_value_ = 0.0;
     throw new std::out_of_range("Invalid Iris Diameter value");
   }
 

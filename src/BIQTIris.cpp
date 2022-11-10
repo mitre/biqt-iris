@@ -87,13 +87,24 @@ Provider::EvaluationResult BIQTIris::evaluate(const std::string &file) {
     // ISO Metrics Map
     quality_result.metrics["iso_usable_iris_area"] = mfo.GetUsableIrisAreaPercent();
     quality_result.metrics["iso_iris_sclera_contrast"] = mfo.GetISOIrisScleraContrast();
-    quality_result.metrics["iso_pupil_iris_contrast"] = mfo.GetISOPupilIrisContrast();
+    quality_result.metrics["iso_iris_pupil_contrast"] = mfo.GetISOPupilIrisContrast();
     quality_result.metrics["iso_pupil_boundary_circularity"] = mfo.GetISOPupilBoundaryCircularity();
     quality_result.metrics["iso_greyscale_utilization"] = mfo.GetISOGreyscaleUtilization();
     quality_result.metrics["iso_pupil_iris_ratio"] = mfo.GetISOPIRatio();
     quality_result.metrics["iso_iris_pupil_concentricity"] = mfo.GetISOIPConcentricity();
     quality_result.metrics["iso_margin_adequacy"] = mfo.GetISOMarginAdequacy();
     quality_result.metrics["iso_sharpness"] = mfo.GetISOSharpness();
+    // Normalized ISO Metrics Map
+    quality_result.metrics["normalized_iso_sharpness"] = mfo.GetNormalizedISOSharpness();
+    quality_result.metrics["normalized_iso_iris_pupil_ratio"] = mfo.GetNormalizedISOPIRatio();
+    quality_result.metrics["normalized_iso_pupil_iris_contrast"] = mfo.GetNormalizedISOPupilIrisContrast();
+    quality_result.metrics["normalized_iso_iris_sclera_contrast"] = mfo.GetNormalizedISOIrisScleraContrast();
+    quality_result.metrics["normalized_iso_margin_adequacy"] = mfo.GetNormalizedISOMarginAdequacy();
+    quality_result.metrics["normalized_iso_greyscale_utilization"] = mfo.GetNormalizedISOGreyscaleUtilization();
+    quality_result.metrics["normalized_iso_iris_pupil_concentricity"] = mfo.GetNormalizedISOIPConcentricity();
+    quality_result.metrics["normalized_iso_iris_diameter"] = mfo.GetNormalizedISOIrisDiameter();
+    // Overall ISO quality metric
+    quality_result.metrics["iso_overall_quality"] = mfo.GetIsoOverallQuality();
 
     // Features Map
     quality_result.features["image_width"] = img.cols;
