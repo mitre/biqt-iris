@@ -5,390 +5,343 @@
 // under contract, and is subject to the Rights in Data-General Clause
 // 52.227-14, Alt. IV (DEC 2007).
 //
-// Copyright 2019 The MITRE Corporation. All Rights Reserved.
+// Copyright 2022 The MITRE Corporation. All Rights Reserved.
 // #######################################################################
-//
-//        FILE: ImageOps.h
-// DESCRIPTION: Class that provides open source Defocus
-//              and Overall Contrast quality metrics for
-//              .bmp iris images.
-//        DATE: 13 June 2012
-//
-//---------------------------------------------------------------------
 
 #ifndef IMAGE_OPS_H
 #define IMAGE_OPS_H
 
 #ifdef _WIN32
 #define IMAGEOPS_EXPORT __declspec(dllexport)
+#include <windows.h>
 #else
 #define IMAGEOPS_EXPORT
 #endif
 
 #define FOCUS_KERNEL_DIM 8
-#define HALF_FOCUS_KERNEL_DIM 4
-#define ERROR_NO_ROI_SELECTED -1001
-#define ERROR_IMAGESIZE_MAX_EXCEEDED -1002
-#define ERROR_ZERO_IMAGESIZE -1003
-#define ERROR_NON_8BPP_INDEXED_BITMAP_FILE -1004
-#define ERROR_LEFT_SCLERA_MARGIN -1101
-#define ERROR_RIGHT_SCLERA_MARGIN -1102
-#define ERROR_UNSPECIFIED_ERROR -9999
-#define RIGHT_IRIS_GS_MARGIN_VALID true
-#define LEFT_IRIS_GS_MARGIN_VALID true
-#define BOTTOM_IRIS_GS_MARGIN_VALID true
-#define TOP_IRIS_GS_MARGIN_VALID true
+
+#include <cmath>
+#include <complex>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <fstream>
+#include <iostream>
+#include <limits>
+#include <stdexcept>
 
 struct Point {
-    int X;
-    int Y;
+  int X;
+  int Y;
 };
 
-// Class for basic image operations
-// Built for  Defocus Metric and Overall Contrast Metric
+// Class for various image operations
 class IMAGEOPS_EXPORT MFilter {
-  public:
-    MFilter();
-    ~MFilter();
-    void initialize();
-    int fastQuality(const unsigned char *framebytes, int width, int height);
-    int getQualityFromImageFrame(const unsigned char *framein, int width,
-                                 int height);
-    inline int getOverallQuality();
-    inline int getDefocusScore();
-    inline int getContrastScore();
-    inline int getIrisRadius();
-    inline int getUsableIrisAreaPercent();
-    inline int getIrisCenterX();
-    inline int getIrisCenterY();
-    inline float getNDefocus();
-    inline float getNContrast();
-    inline float getNISGSMean();
-    inline float getIrisPupilGSDiff();
-    inline float getNIPGSDiff();
-    inline float getNIrisID();
-    inline float getNIrisVis();
-    inline double getISGSDiffMeanAvg();
+ public:
+  MFilter();
+  ~MFilter();
+  void Initialize();
 
-  private:
-    void RawByteFrameToTwoDimArray(const unsigned char *singlearray,
-                                   unsigned char **twodimarray, int width,
-                                   int height);
-    int Defocus(unsigned char **rawimg, int imgwidth, int imgheight);
-    int Defocus(unsigned char *framebytes, int width, int height);
-    int Contrast(unsigned char **rawimg2, int imgwidth2, int imgheight2);
-    int Contrast(unsigned char *framebytes, int imgwidth, int imgheight);
-    void CheckMargins(int imgwidth1, int imgheight1, int IcX, int IcY, int ID);
-    void DownSize(unsigned char **rawimg, int imgwidth, int imgheight,
-                  int downsizescale, unsigned char **dsimage);
-    void EdgeMap(unsigned char **imagein, int dsimageinwidth,
-                 int dsimageinheight);
-    void GetVertEdges(unsigned char **dsbin, int width, int height);
-    void FindFineIris(unsigned char **Rawb, int ImageWidth, int ImageHeight,
-                      int roughIxc, int roughIyc, int roughIdiam);
-    void FindIris(const unsigned char *framebytes, int width, int height);
-    void FindIris(unsigned char **RawbytesIn, int ImageWidth, int ImageHeight);
-    void FindIrisCenter(int **Ledgevals, int **Redgevals, int inimagewidth,
-                        int inimageheight, unsigned char **Rawbytes);
-    void FindPupilCenter(int **Edgev, int inimagewidth, int inimageheight,
-                         int iriscx, int iriscy, int irisd);
-    void FindOcclusions(unsigned char **imagein, int imwidth, int imheight,
-                        int imicx, int imicy, int imrad, int impcx, int impcy,
-                        int imprad);
-    void InitMathTables();
-    void FillEdgeTable();
-    int CalcOverallQuality(int contrast_in, int defocus_in, int ISGSMean_in,
-                           float Margin_in, int IrisD_in, float IrisVis_in,
-                           float ipgsdiff_in, float pupilirisratio_in);
-    int GetQuality(float NContrast, float NDefocus, float NIrisID,
-                   float NISGSMean, float NIrisVis, float NMargin_in,
-                   float NPupilIrisRatio_in, float NIPGSDiff);
-    int FastQuality(unsigned char **rawbytes, int width, int height);
-    int GetQualityFromImage(unsigned char **rawin, int width, int height);
-    float NormalizeContrast(int contrast_in);
-    float NormalizeDefocus(int defocus_in);
-    float NormalizeISGS(int ISGSMean_in);
-    float NormalizeIrisDiameter(int IrisD_in);
-    float NormalizeIPGSDiff(float ipgsdiff_in);
-    float NormalizePupilIrisRatio(float pupilirisratio_in);
-    float NormalizeIrisVisibility(float IrisVis_in);
+  // Main Functions
+  int GetQualityFromImageFrame(const uint8_t *frame_bytes, int width, int height);
 
-    static const int maxwidth = 640;  // RMD will want to change/increase
-    static const int maxheight = 480; // these
-    static const int FocusKernel[FOCUS_KERNEL_DIM][FOCUS_KERNEL_DIM];
-    static const int HalfFocusKernel[HALF_FOCUS_KERNEL_DIM]
-                                    [HALF_FOCUS_KERNEL_DIM];
+  // Quality Attributes
+  int GetContrastScore();
+  int GetDefocusScore();
 
-    bool MathTablesDefined;
+  int GetIrisRadius();
+  double GetISGSDiffMeanAvg();
+  double GetIrisPupilGSDiff();
+  int GetUsableIrisAreaPercent();
 
-    int DefocusScore;
-    int DefocusScoreRef;
-    float NormDefocusScore;
+  int GetPupilRadius();
+  double GetPupilCircularityDeviationAvg();
 
-    unsigned char *Framebin;
-    unsigned char **Rawbin;
-    int **ValF16Edge;
-    unsigned char **ValF16EdgeBytes;
-    unsigned char **TransposedRawbin;
-    unsigned char **MaskedRawbin;
-    int **Rawvals;
-    unsigned char **DSRawbin;
-    int **DSvalbin;
-    unsigned char **NegDSRawbin;
-    int **NegDSvalbin;
-    int **Edgevalbin;
-    int **PupilEdgebin;
-    int **TransposedEdgebin;
-    unsigned char **EdgeRawbin;
-    int **VertEdge;
-    unsigned char **VertEdgebin;
+  // (Normalized) Quality Attributes
+  double GetNContrast();
+  double GetNDefocus();
 
-    int dswidth;
-    int dsheight;
-    static const int maxsegs = 256; // use a lower number for quicker execution
-    static const int MaxR = 250;    // use a lower number for quicker execution
-    int IrisCenterX;
-    int IrisCenterY;
-    int IrisRadius;
-    int RoughIrisRadius;
-    int RoughIriscx;
-    int RoughIriscy;
-    int RoughPcx;
-    int RoughPcy;
-    int RoughPrad;
-    int RoughPdiam;
-    int bestresponse;
-    int rightresponse;
-    int leftresponse;
-    int maxIrisFindLeftEdgeResponse;
-    int bestdarkiriscenter;
-    int maxIrisFindRightEdgeResponse;
-    int MaxPupilEdgeResponse;
-    int edgeresponse;
-    int maxVertEdgeResponse;
-    int leftedgeIrisCenterx;
-    int leftedgeIrisCentery;
-    int leftedgeIrisDiameter;
-    int rightedgeIrisCenterx;
-    int rightedgeIrisCentery;
-    int rightedgeIrisDiameter;
-    int UsableIrisAreaPercent;
-    static int PolarSegMax;
+  double GetNIrisID();
+  double GetNISGSMean();
+  double GetNIPGSDiff();
+  double GetNIrisVis();
 
-    /** The angle in the range 0-255. 0 is 0 degrees. 64 is 90 deg. 128 is 180
-     * deg 192 is 270 deg */
-    int *ISGSVals;
-    int *PupilVals;
+  // ISO Metrics
+  double GetISOIrisScleraContrast();
+  double GetISOIrisPupilContrast();
+  double GetISOPupilBoundaryCircularity();
+  double GetISOGreyscaleUtilization();
+  double GetISOPIRatio();
+  double GetISOIPConcentricity();
+  double GetISOMarginAdequacy();
+  double GetISOSharpness();
+  double GetNormalizedISOIrisScleraContrast();
+  double GetNormalizedISOIrisPupilContrast();
+  double GetNormalizedISOGreyscaleUtilization();
+  double GetNormalizedISOPIRatio();
+  double GetNormalizedISOIPConcentricity();
+  double GetNormalizedISOIrisDiameter();
+  double GetNormalizedISOMarginAdequacy();
+  double GetNormalizedISOSharpness();
+  int GetIsoOverallQuality();
 
-    float ContrastLowLimit;
-    float ContrastUpperLimit;
-    float NContrastValueAtLowLimit;
-    float NContrastValueAtUpperLimit;
-    float NContrastFactor;
-    float DefocusLowLimit;
-    float DefocusUpperLimit;
-    float NDefocusValueAtLowLimit;
-    float NDefocusValueAtUpperLimit;
-    float NDefocusFactor;
-    float IDLowLimit;
-    float IDMedLimit1;
-    float IDMedLimit2;
-    float IDUpperLimit;
-    float NIDiamFactor;
-    float ISGSMeanLowLimit;
-    float ISGSMeanUpperLimit;
-    float NISGSValueAtLowLimit;
-    float NISGSValueAtUpperLimit;
-    float NISGSFactor;
-    float IrisVisLowLimit;
-    float IrisVisUpperLimit;
-    float IPGSDiffLowLimit;
-    float IPGSDiffUpperLimit;
-    float NIPGSDiffFactor;
-    float NPupilIrisRatio;
-    float PupilIrisRatioLowLimit;
-    float PupilIrisRatioHighLimit;
-    float NPupilIrisRatioFactor;
-    float NIrisVisFactor;
-    float CombinedQuality;
-    float NContrast;
-    float NDefocus;
-    float NIrisID;
-    float NISGSMean;
-    float NIrisVis;
-    float NIPGSDiff;
-    float CombinedQualityLowLimit;
-    float CombinedQualityUpperLimit;
+  // Features
+  int GetIrisCenterX();
+  int GetIrisCenterY();
+  int GetPupilCenterX();
+  int GetPupilCenterY();
 
-    int OverallQuality;
-    int ***trigvals;
-    /**
-     * holds x coords. for 1% vertical steps up a 100 radius circle for upper
-     * right quadrant ex.:  irispts[50].Y = 100*sin(30deg)
-     */
-    Point *irispts;
-    int *cos;
+  int min_width_ = 256;
+  int min_height_ = 256;
+  int max_width_ = 640;
+  int max_height_ = 480;
 
-    /**
-     * sets up a table of trig values where [t, , ] is the anglesegment theta in
-     * 2pi radians/maxsegs increments [ ,r, ] is the radius distance [ , ,0] is
-     * r*sin(theta) [ , ,1] is r*cos(theta)
-     */
+ private:
+  void CreateImagePointers(int width, int height);
+  void DeleteImagePointers(int width, int height);
+  void InitMathTables();
 
-    /**
-     * Iris Finder Settings
-     *  27 is good ..25 is 100 radius - 200 diameter 22 is 88 radius - 176 diam
-     *  42 is good for test data (max diameter = 336) 400 diameter - 400/8 = 50
-     *  60 is good Max trial radius for 160x120 image...60 is 240 radius - 480
-     * diameter
-     */
-    int MinRtrial;
-    int MaxRtrial;
-    /** 47 works  256 / 4 = 64  43 is 60 degrees   32 is 45 deg. */
-    static int LowerSegTrial;
-    /** 35 works higher fails on droopy eyelids cause failure   lower fails on
-     * large pupils */
-    static int UpperSegTrial;
-    /** Upper max segment MUST ALWAYS BE LESS THAN number of lowersegments tried
-     */
-    int *uppersegpointresponses;
-    int *maxuppersegresponses;
-    /** Pupil finder settings */
-    static int PLowerSegTrial;
-    /** Pupil finder settings */
-    static int PUpperSegTrial;
+  int CalcOverallQuality(int contrast, int defocus,
+                         int isgs_mean, double margin, int iris_d,
+                         double iris_vis, double ipgs_diff,
+                         double iris_pupil_ratio);
 
-    /**
-     * 6 x4 x 2 = 48 pixel diameter    8 x 4*2 = 64 pixel diameter
-     * This value will get changed by the pupil finder based upon iris diameter
-     * found 22 * 8 is 176 pixel max pupil diamter
-     */
-    int MinPrtrial;
-    int MaxPrtrial;
-    int pupilCx;
-    int pupilCy;
-    int pupilRad;
-    int pupilD;
-    int ***radials;
+  int Calc_ISO_Overall_Quality(double n_iso_sharpness_value_, double n_iso_greyscale_value_,
+                                 double n_iso_ip_concentricity_value_, double n_iso_iris_sclera_contrast_value_,
+                                 double n_iso_margin_adequacy_value_, double n_iso_iris_pupil_contrast_value_,
+                                 double n_iso_iris_pupil_ratio_value_);
+  int GetQuality(double n_contrast, double n_defocus, double n_iris_d,
+                 double n_isgs_mean, double n_iris_vis, double n_margin,
+                 double n_iris_pupil_ratio, double n_ipgs_diff);
+  int Defocus(uint8_t **raw_img, int width, int height);
+  int Contrast(uint8_t **raw_img, int width, int height);
 
-    static double dMaxR;
-    static int seg90;
-    static double singlesegment;
+  double NormalizeDefocus(int defocus);
+  double NormalizeContrast(int contrast);
+  double NormalizeIrisDiameter(int iris_d);
+  double NormalizeISGS(int isgs_mean);
+  double NormalizeIPGSDiff(double ipgs_diff);
+  double NormalizeIrisPupilRatio(double iris_pupil_ratio);
+  double NormalizeIrisVisibility(double iris_vis);
 
-    int ContrastScore;
-    int AverageImageIntensity;
+  void ISOContrast(const uint8_t *raw_img, const int width, const int height);
+  void ISOPupilBoundaryCircularity(const double *pupil_radii, const int m, const int n);
+  void ISOGreyscaleUtilization(const uint8_t *raw_img, const int width, const int height);
+  void ISOIrisPupilConcentricity();
+  void ISOMarginAdequacy(int width, int height);
+  void ISOSharpness(const uint8_t *raw_img, const int width, const int height);
 
-    double LMargin;
-    double RMargin;
-    double TMargin;
-    double BMargin;
-    double LRMarginMetricTotalDeduct;
-    double TBMarginMetricTotalDeduct;
-    double OverallMargin;
-    double ISGSDiffMeanAvg;
-    double ISGSDiffMeanMax;
-    float IrisPupilGSDiff;
-    float PupilIrisDiameterRatio;
+  void FindIris(const uint8_t *frame_bytes, int width, int height);
+  void FindIris(uint8_t **raw_bytes, int width, int height);
+  void FindIrisCenter(int **l_edge_vals, int **r_edge_vals, int width,
+                      int height, uint8_t **raw_bytes);
+  void FindFineIris(uint8_t **raw_bytes, int width, int height, int rough_iris_center_x,
+                    int rough_iris_center_y, int rough_iris_diameter);
+  void FindPupilCenter(int **edge_v, int width, int height, int iris_center_x,
+                       int iris_center_y, int iris_diameter);
+  void FindFinePupil(int rough_pupil_center_x, int rough_pupil_center_y, int width, int height);
+  void FindOcclusions(uint8_t **raw_img, int width, int height, int iris_center_x, int iris_center_y,
+                      int iris_radius, int pupil_center_x, int pupil_center_y, int pupil_radius);
 
-    int pointresponse;
-    int maxpointresponse;
+  void RawByteFrameToTwoDimArray(const uint8_t *frame_bytes, uint8_t **raw_img, int width, int height);
+  void CheckMargins(int width, int height, int iris_center_x, int iris_center_y, int iris_diameter);
+  void DownSize(uint8_t **raw_img, int width, int height, int downsize_scale, uint8_t **ds_img);
+  void EdgeMap(uint8_t **raw_img, int width, int height);
+  void GetVertEdges(uint8_t **raw_img, int width, int height);
+
+  int max_segs_ = 256;
+  int max_radius_ = 250;
+  int lower_seg_trial_ = 47;
+  int upper_seg_trial_ = 35;
+  int p_lower_seg_trial_ = 63;
+  int p_upper_seg_trial_ = 35;
+  int focus_kernel_[FOCUS_KERNEL_DIM][FOCUS_KERNEL_DIM] = {
+      {-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1},
+      {-1, -1, 3, 3, 3, 3, -1, -1}, {-1, -1, 3, 3, 3, 3, -1, -1},
+      {-1, -1, 3, 3, 3, 3, -1, -1}, {-1, -1, 3, 3, 3, 3, -1, -1},
+      {-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}};
+
+  bool math_tables_defined_;
+
+  int max_point_response_;
+  int min_r_trial_;
+  int max_r_trial_;
+  int min_p_r_trial_;
+  int max_p_r_trial_;
+  int pupil_cx_;
+  int pupil_cy_;
+  int pupil_rad_;
+  int pupil_d_;
+  int iris_center_x_;
+  int iris_center_y_;
+  int iris_radius_;
+  int pupil_center_x_;
+  int pupil_center_y_;
+  int pupil_radius_;
+  int overall_quality_;
+  int iso_overall_quality_;
+  int defocus_score_;
+  int contrast_score_;
+  int usable_iris_area_percent_;
+
+  double combined_quality_;
+  double overall_margin_;
+  double isgs_diff_mean_avg_;
+  double iris_pupil_gs_diff_;
+  double iris_pupil_diameter_ratio_;
+  double pupil_circularity_avg_deviation_;
+  double iso_iris_sclera_contrast_value_;
+  double iso_iris_pupil_contrast_value_;
+  double iso_pupil_boundary_circularity_value_;
+  double iso_greyscale_value_;
+  double iso_ip_concentricity_value_;
+  double iso_margin_adequacy_value_;
+  double iso_sharpness_value_;
+  double n_iso_iris_sclera_contrast_value_;
+  double n_iso_iris_pupil_contrast_value_;
+  double n_iso_iris_pupil_ratio_value_;
+  double n_iso_pupil_boundary_circularity_value_;
+  double n_iso_greyscale_value_;
+  double n_iso_ip_concentricity_value_;
+  double n_iso_margin_adequacy_value_;
+  double n_iso_sharpness_value_;
+  double n_iso_usable_iris_area_value_;
+  double n_iso_iris_diameter_value_;
+  double n_contrast_;
+  double n_defocus_;
+  double n_iris_id_;
+  double n_isgs_mean_;
+  double n_iris_vis_;
+  double n_ipgs_diff_;
+  double n_iris_pupil_ratio_;
+  double n_defocus_factor_;
+  double n_contrast_factor_;
+  double n_i_diam_factor_;
+  double n_isgs_factor_;
+  double n_ipgs_diff_factor_;
+  double n_iris_pupil_ratio_factor_;
+  double n_iris_vis_factor_;
+  double defocus_low_limit_;
+  double defocus_upper_limit_;
+  double contrast_low_limit_;
+  double contrast_upper_limit_;
+  double i_d_low_limit_;
+  double i_d_med_limit_1_;
+  double i_d_med_limit_2_;
+  double i_d_upper_limit_;
+  double isgs_mean_low_limit_;
+  double isgs_mean_upper_limit_;
+  double iris_vis_low_limit_;
+  double iris_vis_upper_limit_;
+  double ipgs_diff_low_limit_;
+  double ipgs_diff_upper_limit_;
+  double iris_pupil_ratio_low_limit_;
+  double iris_pupil_ratio_high_limit_;
+  double combined_quality_low_limit_;
+  double combined_quality_upper_limit_;
+  double dimless_r_[256];
+
+  /** The angle in the range 0-255. 0 is 0 degrees. 64 is 90 deg. 128 is 180
+   * deg 192 is 270 deg */
+  int *isgs_vals_;
+  int *cos;
+  int **val_f16_edge_;
+  int **ds_val_bin_;
+  int **neg_ds_val_bin_;
+  int **edge_val_bin_;
+  int **pupil_edge_bin_;
+  int **transposed_edge_bin_;
+  int **vert_edge_;
+  int ***trig_vals_;
+
+  unsigned char **raw_bin_;
+  unsigned char **transposed_raw_bin_;
+  unsigned char **masked_raw_bin_;
+  unsigned char **ds_raw_bin_;
+  unsigned char **neg_ds_raw_bin_;
+  unsigned char **edge_raw_bin_;
+  unsigned char **vert_edge_bin_;
 };
 
-/**
- * Returns the overall quality of the image.
- *
- * @return an integer indicating the overall quality of the image.
- */
-/* inline */ int MFilter::getOverallQuality() { return OverallQuality; }
+inline int MFilter::GetContrastScore() { return contrast_score_; }
+
+inline int MFilter::GetDefocusScore() { return defocus_score_; }
+
+inline int MFilter::GetIrisRadius() { return iris_radius_; }
+
+inline double MFilter::GetISGSDiffMeanAvg() { return isgs_diff_mean_avg_; }
+
+inline double MFilter::GetIrisPupilGSDiff() { return iris_pupil_gs_diff_; }
+
+inline int MFilter::GetUsableIrisAreaPercent() { return usable_iris_area_percent_; }
+
+inline int MFilter::GetPupilRadius() { return pupil_radius_; }
+
+inline double MFilter::GetPupilCircularityDeviationAvg() { return pupil_circularity_avg_deviation_; }
+
+inline double MFilter::GetNContrast() { return n_contrast_; }
+
+inline double MFilter::GetNDefocus() { return n_defocus_; }
+
+inline double MFilter::GetNIrisID() { return n_iris_id_; }
+
+inline double MFilter::GetNISGSMean() { return n_isgs_mean_; }
+
+inline double MFilter::GetNIPGSDiff() { return n_ipgs_diff_; }
+
+inline double MFilter::GetNIrisVis() { return n_iris_vis_; }
+
+inline double MFilter::GetISOIrisScleraContrast() { return iso_iris_sclera_contrast_value_; }
+
+inline double MFilter::GetISOIrisPupilContrast() { return iso_iris_pupil_contrast_value_; }
+
+inline double MFilter::GetISOPupilBoundaryCircularity() { return iso_pupil_boundary_circularity_value_; }
+
+inline double MFilter::GetISOGreyscaleUtilization() { return iso_greyscale_value_; }
+
+inline double MFilter::GetISOPIRatio() { return ((double) pupil_rad_ / (double) iris_radius_) * 100.0; }
+
+inline double MFilter::GetISOIPConcentricity() { return iso_ip_concentricity_value_; }
+
+inline double MFilter::GetISOMarginAdequacy() { return iso_margin_adequacy_value_; }
+
+inline double MFilter::GetISOSharpness() { return iso_sharpness_value_; }
+
+inline double MFilter::GetNormalizedISOSharpness() { return n_iso_sharpness_value_; }
+
+inline double MFilter::GetNormalizedISOGreyscaleUtilization() { return n_iso_greyscale_value_; }
+
+inline double MFilter::GetNormalizedISOIPConcentricity() { return n_iso_ip_concentricity_value_; }
+
+inline double MFilter::GetNormalizedISOIrisDiameter() { return n_iso_iris_diameter_value_; }
+
+inline double MFilter::GetNormalizedISOIrisScleraContrast() { return n_iso_iris_sclera_contrast_value_; }
+
+inline double MFilter::GetNormalizedISOMarginAdequacy() { return n_iso_margin_adequacy_value_; }
+
+inline double MFilter::GetNormalizedISOIrisPupilContrast() { return n_iso_iris_pupil_contrast_value_; }
+
+inline double MFilter::GetNormalizedISOPIRatio() { return n_iso_iris_pupil_ratio_value_; }
+
+inline int MFilter::GetIsoOverallQuality() { return iso_overall_quality_; }
+
+inline int MFilter::GetIrisCenterX() { return iris_center_x_; }
+
+inline int MFilter::GetIrisCenterY() { return iris_center_y_; }
+
+inline int MFilter::GetPupilCenterX() { return pupil_center_x_; }
+
+inline int MFilter::GetPupilCenterY() { return pupil_center_y_; }
 
 /**
  *
- * @return
+ * @param a The first item to compare
+ * @param b The second item to compare
+ * @return An integer indicating the relationship between the 2 numbers. 0
+ *      indicates equality, a negative number indicates b > a, and a positive
+ *      number indicates b < a
  */
-/* inline */ int MFilter::getDefocusScore() { return DefocusScore; }
-
-/**
- *
- * @return
- */
-/* inline */ int MFilter::getContrastScore() { return ContrastScore; }
-
-/**
- * Returns the radius of the iris in the image.
- *
- * @return the radius in pixels.
- */
-/* inline */ int MFilter::getIrisRadius() { return IrisRadius; }
-
-/**
- * Returns the x coordinate of the center of the iris.
- *
- * @return the x coordinate in pixels
- */
-/* inline */ int MFilter::getIrisCenterX() { return IrisCenterX; }
-
-/**
- * Returns the y coordinate of the center of the iris.
- *
- * @return the y coordinate in pixels.
- */
-/* inline */ int MFilter::getIrisCenterY() { return IrisCenterY; }
-
-/**
- *
- * @return
- */
-/* inline */ int MFilter::getUsableIrisAreaPercent()
-{
-    return UsableIrisAreaPercent;
-}
-
-/**
- *
- * @return
- */
-/* inline */ float MFilter::getNDefocus() { return NDefocus; }
-
-/**
- *
- * @return
- */
-/* inline */ float MFilter::getNContrast() { return NContrast; }
-
-/**
- *
- * @return
- */
-/* inline */ float MFilter::getNISGSMean() { return NISGSMean; }
-
-/**
- *
- * @return
- */
-/* inline */ float MFilter::getIrisPupilGSDiff() { return IrisPupilGSDiff; }
-
-/**
- *
- * @return
- */
-/* inline */ float MFilter::getNIPGSDiff() { return NIPGSDiff; }
-
-/**
- *
- * @return
- */
-/* inline */ float MFilter::getNIrisID() { return NIrisID; }
-
-/**
- *
- * @return
- */
-/* inline */ float MFilter::getNIrisVis() { return NIrisVis; }
-
-/**
- *
- * @return
- */
-/* inline */ double MFilter::getISGSDiffMeanAvg() { return ISGSDiffMeanAvg; }
+inline int compare(const void *a, const void *b) { return *(uint8_t *) a - *(uint8_t *) b; }
 
 #endif
