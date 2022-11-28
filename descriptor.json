@@ -84,13 +84,13 @@
       "defaultValue": "0.0"
     },
     {
-      "name": "iso_pupil_iris_contrast",
+      "name": "iso_iris_pupil_contrast",
       "description": "The image characteristics at the boundary between the iris region and the pupil.",
       "type": "FLOAT",
       "defaultValue": "0.0"
     },
     {
-      "name": "iso_pupil_iris_ratio",
+      "name": "iso_iris_pupil_ratio",
       "description": "The degree to which the pupil is dilated or constricted.",
       "type": "DOUBLE",
       "defaultValue": "0.0"

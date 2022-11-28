@@ -19,16 +19,16 @@ MFilter::MFilter()
       i_d_upper_limit_(400), n_i_diam_factor_(1), isgs_mean_low_limit_(20),
       isgs_mean_upper_limit_(30), n_isgs_factor_(1), iris_vis_low_limit_(0.4),
       iris_vis_upper_limit_(0.7), ipgs_diff_low_limit_(15), ipgs_diff_upper_limit_(30),
-      n_ipgs_diff_factor_(1), n_pupil_iris_ratio_(1),
-      pupil_iris_ratio_low_limit_(0.20), pupil_iris_ratio_high_limit_(0.60),
-      n_pupil_iris_ratio_factor_(1), n_iris_vis_factor_(1), combined_quality_low_limit_(0),
+      n_ipgs_diff_factor_(1), n_iris_pupil_ratio_(1),
+      iris_pupil_ratio_low_limit_(0.20), iris_pupil_ratio_high_limit_(0.60),
+      n_iris_pupil_ratio_factor_(1), n_iris_vis_factor_(1), combined_quality_low_limit_(0),
       combined_quality_upper_limit_(0.80), overall_quality_(0), min_r_trial_(28),
       max_r_trial_(42), min_p_r_trial_(8), max_p_r_trial_(32), pupil_cx_(0), pupil_cy_(0),
       pupil_rad_(5), pupil_d_(10), contrast_score_(0),
       overall_margin_(1.0), isgs_diff_mean_avg_(0.0),
       iris_pupil_gs_diff_(0.0), max_point_response_(1000), pupil_circularity_avg_deviation_(0.0),
       n_iso_sharpness_value_(1.0), n_iso_greyscale_value_(1.0),
-      n_iso_margin_adequacy_value_(1.0), n_iso_pupil_iris_contrast_value_(1.0), n_iso_iris_pupil_ratio_value_(1.0) ,
+      n_iso_margin_adequacy_value_(1.0), n_iso_iris_pupil_contrast_value_(1.0), n_iso_iris_pupil_ratio_value_(1.0) ,
       n_iso_ip_concentricity_value_(1.0), n_iso_iris_sclera_contrast_value_(1.0), iso_overall_quality_(100){
 
   cos = new int[101];
@@ -98,11 +98,11 @@ int MFilter::GetQualityFromImageFrame(const uint8_t *frame_bytes, int width, int
     double iris_vis = usable_iris_area_percent_ / 100.0;
     overall_quality = CalcOverallQuality(contrast_score_, defocus_score_, (int) isgs_diff_mean_avg_,
                                          overall_margin_, iris_radius_ * 2, iris_vis,
-                                         iris_pupil_gs_diff_, pupil_iris_diameter_ratio_);
+                                         iris_pupil_gs_diff_, iris_pupil_diameter_ratio_);
 
     iso_overall_quality_ = Calc_ISO_Overall_Quality(n_iso_sharpness_value_, n_iso_greyscale_value_,
                                                     n_iso_ip_concentricity_value_, n_iso_iris_sclera_contrast_value_,
-                                                    n_iso_margin_adequacy_value_, n_iso_pupil_iris_contrast_value_,
+                                                    n_iso_margin_adequacy_value_, n_iso_iris_pupil_contrast_value_,
                                                     n_iso_iris_pupil_ratio_value_);
   } catch (std::exception &ex) {
     std::cerr << "exception caught: " << ex.what() << std::endl;
@@ -219,7 +219,7 @@ void MFilter::InitMathTables() {
 int MFilter::CalcOverallQuality(int contrast, int defocus,
                                 int isgs_mean, double margin, int iris_d,
                                 double iris_vis, double ipgs_diff,
-                                double pupil_iris_ratio) {
+                                double iris_pupil_ratio) {
   overall_quality_ = 0;
   // Normalize Contrast value
   NormalizeContrast(contrast);
@@ -232,25 +232,25 @@ int MFilter::CalcOverallQuality(int contrast, int defocus,
   // Normalize IPGSDifference
   n_ipgs_diff_ = NormalizeIPGSDiff(ipgs_diff);
   // Normalize IPDiamRatio
-  n_pupil_iris_ratio_ = NormalizePupilIrisRatio(pupil_iris_ratio);
+  n_iris_pupil_ratio_ = NormalizeIrisPupilRatio(iris_pupil_ratio);
   // Normalize IrisVisibility
   n_iris_vis_ = NormalizeIrisVisibility(iris_vis);
   // Calculate combined_quality_ Score
   overall_quality_ =
       GetQuality(n_contrast_, n_defocus_, n_iris_id_, n_isgs_mean_, n_iris_vis_, margin,
-                 n_pupil_iris_ratio_, n_ipgs_diff_);
+                 n_iris_pupil_ratio_, n_ipgs_diff_);
   // Finally Scale the combined_quality_ output metric
   return overall_quality_;
 }
 
 int MFilter::Calc_ISO_Overall_Quality(double n_iso_sharpness_value, double n_iso_greyscale_value, double n_iso_ip_concentricity_value, double  n_iso_iris_sclera_contrast_value,
-                                      double n_iso_margin_adequacy_value, double n_iso_pupil_iris_contrast_value, double n_iso_iris_pupil_ratio_value) {
+                                      double n_iso_margin_adequacy_value, double n_iso_iris_pupil_contrast_value, double n_iso_iris_pupil_ratio_value) {
     double iso_overall_quality = 0.0;
     int iso_overall_quality_100 = 0;
 
 
     iso_overall_quality = n_iso_greyscale_value * n_iso_iris_sclera_contrast_value * n_iso_margin_adequacy_value *
-                          n_iso_pupil_iris_contrast_value * n_iso_ip_concentricity_value;
+                          n_iso_iris_pupil_contrast_value * n_iso_ip_concentricity_value;
     iso_overall_quality_100 = 100 * iso_overall_quality;
     return iso_overall_quality_100;
 }
@@ -258,10 +258,10 @@ int MFilter::Calc_ISO_Overall_Quality(double n_iso_sharpness_value, double n_iso
 
 int MFilter::GetQuality(double n_contrast, double n_defocus, double n_iris_d,
                         double n_isgs_mean, double n_iris_vis, double n_margin,
-                        double n_pupil_iris_ratio, double n_ipgs_diff) {
+                        double n_iris_pupil_ratio, double n_ipgs_diff) {
   combined_quality_ = (n_contrast * n_contrast_factor_ * n_defocus * n_defocus_factor_ *
       n_iris_d * n_isgs_mean * n_isgs_factor_ * n_iris_vis * n_iris_vis_factor_ *
-      n_margin * n_pupil_iris_ratio * n_pupil_iris_ratio_factor_ *
+      n_margin * n_iris_pupil_ratio * n_iris_pupil_ratio_factor_ *
       n_ipgs_diff * n_ipgs_diff_factor_);
 
   if (combined_quality_ > combined_quality_low_limit_) {
@@ -428,19 +428,19 @@ double MFilter::NormalizeIPGSDiff(double ipgs_diff) {
   return n_ipgs_diff_;
 }
 
-double MFilter::NormalizePupilIrisRatio(double pupil_iris_ratio) {
-  n_pupil_iris_ratio_ = 0.0;
-  if (pupil_iris_ratio < pupil_iris_ratio_low_limit_) {
-    n_pupil_iris_ratio_ = 0.0;
+double MFilter::NormalizeIrisPupilRatio(double iris_pupil_ratio) {
+  n_iris_pupil_ratio_ = 0.0;
+  if (iris_pupil_ratio < iris_pupil_ratio_low_limit_) {
+    n_iris_pupil_ratio_ = 0.0;
   }
-  if (pupil_iris_ratio >= pupil_iris_ratio_low_limit_ && pupil_iris_ratio <= pupil_iris_ratio_high_limit_) {
-    n_pupil_iris_ratio_ = 1.0;
+  if (iris_pupil_ratio >= iris_pupil_ratio_low_limit_ && iris_pupil_ratio <= iris_pupil_ratio_high_limit_) {
+    n_iris_pupil_ratio_ = 1.0;
   }
-  if (pupil_iris_ratio > pupil_iris_ratio_high_limit_) {
-    n_pupil_iris_ratio_ = 0.0;
+  if (iris_pupil_ratio > iris_pupil_ratio_high_limit_) {
+    n_iris_pupil_ratio_ = 0.0;
   }
 
-  return n_pupil_iris_ratio_;
+  return n_iris_pupil_ratio_;
 }
 
 double MFilter::NormalizeIrisVisibility(double iris_vis) {
@@ -469,7 +469,7 @@ double MFilter::NormalizeIrisVisibility(double iris_vis) {
 void MFilter::ISOContrast(const uint8_t *raw_img, const int width, const int height) {
   if (iris_radius_ == 0 || pupil_rad_ == 0) {
     iso_iris_sclera_contrast_value_ = 0.0;
-    iso_pupil_iris_contrast_value_ = 0.0;
+    iso_iris_pupil_contrast_value_ = 0.0;
 
     return;
   }
@@ -671,11 +671,11 @@ void MFilter::ISOContrast(const uint8_t *raw_img, const int width, const int hei
   // now calculate the value
   double weber_ratio = (iris_median - pupil_median) / (20 + pupil_median);
 
-  iso_pupil_iris_contrast_value_ = 100.0 * (weber_ratio / (0.75 + weber_ratio));
+  iso_iris_pupil_contrast_value_ = 100.0 * (weber_ratio / (0.75 + weber_ratio));
   // The spec doesn't mention an absolute value here, but a negative value would indicate something is wrong.
-  // Limit lower boundary of iso_pupil_iris_contrast_value_ to 0.0.
-  if (iso_pupil_iris_contrast_value_ < 0) {
-    iso_pupil_iris_contrast_value_ = 0.0;
+  // Limit lower boundary of iso_iris_pupil_contrast_value_ to 0.0.
+  if (iso_iris_pupil_contrast_value_ < 0) {
+    iso_iris_pupil_contrast_value_ = 0.0;
   }
 
   delete[] pupil_pixels;
@@ -1419,14 +1419,14 @@ void MFilter::FindPupilCenter(int **edge_v, int width, int height, int iris_cent
     }
 
     iris_pupil_gs_diff_ = (double) ipgs_response / (double) ipgs_points_used;
-    pupil_iris_diameter_ratio_ = (double) pupil_rad_ / (double) iris_radius_;
+    iris_pupil_diameter_ratio_ = (double) pupil_rad_ / (double) iris_radius_;
   } catch (std::exception &ex) {
     std::cerr << "exception caught: " << ex.what() << std::endl;
     pupil_cx_ = iris_center_x_;
     pupil_cy_ = iris_center_y;
     pupil_rad_ = 30;
     pupil_d_ = iris_radius_ * 2;
-    pupil_iris_diameter_ratio_ = .2;
+    iris_pupil_diameter_ratio_ = .2;
     iris_pupil_gs_diff_ = 0;
   }
 }

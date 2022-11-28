@@ -69,7 +69,7 @@ class IMAGEOPS_EXPORT MFilter {
 
   // ISO Metrics
   double GetISOIrisScleraContrast();
-  double GetISOPupilIrisContrast();
+  double GetISOIrisPupilContrast();
   double GetISOPupilBoundaryCircularity();
   double GetISOGreyscaleUtilization();
   double GetISOPIRatio();
@@ -77,7 +77,7 @@ class IMAGEOPS_EXPORT MFilter {
   double GetISOMarginAdequacy();
   double GetISOSharpness();
   double GetNormalizedISOIrisScleraContrast();
-  double GetNormalizedISOPupilIrisContrast();
+  double GetNormalizedISOIrisPupilContrast();
   double GetNormalizedISOGreyscaleUtilization();
   double GetNormalizedISOPIRatio();
   double GetNormalizedISOIPConcentricity();
@@ -105,15 +105,15 @@ class IMAGEOPS_EXPORT MFilter {
   int CalcOverallQuality(int contrast, int defocus,
                          int isgs_mean, double margin, int iris_d,
                          double iris_vis, double ipgs_diff,
-                         double pupil_iris_ratio);
+                         double iris_pupil_ratio);
 
   int Calc_ISO_Overall_Quality(double n_iso_sharpness_value_, double n_iso_greyscale_value_,
                                  double n_iso_ip_concentricity_value_, double n_iso_iris_sclera_contrast_value_,
-                                 double n_iso_margin_adequacy_value_, double n_iso_pupil_iris_contrast_value_,
+                                 double n_iso_margin_adequacy_value_, double n_iso_iris_pupil_contrast_value_,
                                  double n_iso_iris_pupil_ratio_value_);
   int GetQuality(double n_contrast, double n_defocus, double n_iris_d,
                  double n_isgs_mean, double n_iris_vis, double n_margin,
-                 double n_pupil_iris_ratio, double n_ipgs_diff);
+                 double n_iris_pupil_ratio, double n_ipgs_diff);
   int Defocus(uint8_t **raw_img, int width, int height);
   int Contrast(uint8_t **raw_img, int width, int height);
 
@@ -122,7 +122,7 @@ class IMAGEOPS_EXPORT MFilter {
   double NormalizeIrisDiameter(int iris_d);
   double NormalizeISGS(int isgs_mean);
   double NormalizeIPGSDiff(double ipgs_diff);
-  double NormalizePupilIrisRatio(double pupil_iris_ratio);
+  double NormalizeIrisPupilRatio(double iris_pupil_ratio);
   double NormalizeIrisVisibility(double iris_vis);
 
   void ISOContrast(const uint8_t *raw_img, const int width, const int height);
@@ -189,17 +189,17 @@ class IMAGEOPS_EXPORT MFilter {
   double overall_margin_;
   double isgs_diff_mean_avg_;
   double iris_pupil_gs_diff_;
-  double pupil_iris_diameter_ratio_;
+  double iris_pupil_diameter_ratio_;
   double pupil_circularity_avg_deviation_;
   double iso_iris_sclera_contrast_value_;
-  double iso_pupil_iris_contrast_value_;
+  double iso_iris_pupil_contrast_value_;
   double iso_pupil_boundary_circularity_value_;
   double iso_greyscale_value_;
   double iso_ip_concentricity_value_;
   double iso_margin_adequacy_value_;
   double iso_sharpness_value_;
   double n_iso_iris_sclera_contrast_value_;
-  double n_iso_pupil_iris_contrast_value_;
+  double n_iso_iris_pupil_contrast_value_;
   double n_iso_iris_pupil_ratio_value_;
   double n_iso_pupil_boundary_circularity_value_;
   double n_iso_greyscale_value_;
@@ -214,13 +214,13 @@ class IMAGEOPS_EXPORT MFilter {
   double n_isgs_mean_;
   double n_iris_vis_;
   double n_ipgs_diff_;
-  double n_pupil_iris_ratio_;
+  double n_iris_pupil_ratio_;
   double n_defocus_factor_;
   double n_contrast_factor_;
   double n_i_diam_factor_;
   double n_isgs_factor_;
   double n_ipgs_diff_factor_;
-  double n_pupil_iris_ratio_factor_;
+  double n_iris_pupil_ratio_factor_;
   double n_iris_vis_factor_;
   double defocus_low_limit_;
   double defocus_upper_limit_;
@@ -236,8 +236,8 @@ class IMAGEOPS_EXPORT MFilter {
   double iris_vis_upper_limit_;
   double ipgs_diff_low_limit_;
   double ipgs_diff_upper_limit_;
-  double pupil_iris_ratio_low_limit_;
-  double pupil_iris_ratio_high_limit_;
+  double iris_pupil_ratio_low_limit_;
+  double iris_pupil_ratio_high_limit_;
   double combined_quality_low_limit_;
   double combined_quality_upper_limit_;
   double dimless_r_[256];
@@ -294,7 +294,7 @@ inline double MFilter::GetNIrisVis() { return n_iris_vis_; }
 
 inline double MFilter::GetISOIrisScleraContrast() { return iso_iris_sclera_contrast_value_; }
 
-inline double MFilter::GetISOPupilIrisContrast() { return iso_pupil_iris_contrast_value_; }
+inline double MFilter::GetISOIrisPupilContrast() { return iso_iris_pupil_contrast_value_; }
 
 inline double MFilter::GetISOPupilBoundaryCircularity() { return iso_pupil_boundary_circularity_value_; }
 
@@ -320,7 +320,7 @@ inline double MFilter::GetNormalizedISOIrisScleraContrast() { return n_iso_iris_
 
 inline double MFilter::GetNormalizedISOMarginAdequacy() { return n_iso_margin_adequacy_value_; }
 
-inline double MFilter::GetNormalizedISOPupilIrisContrast() { return n_iso_pupil_iris_contrast_value_; }
+inline double MFilter::GetNormalizedISOIrisPupilContrast() { return n_iso_iris_pupil_contrast_value_; }
 
 inline double MFilter::GetNormalizedISOPIRatio() { return n_iso_iris_pupil_ratio_value_; }
 
