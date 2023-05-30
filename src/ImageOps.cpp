@@ -15,15 +15,15 @@ MFilter::MFilter()
       iris_center_x_(0), iris_center_y_(0), iris_radius_(0), usable_iris_area_percent_(0),
       contrast_low_limit_(30.0), contrast_upper_limit_(50.0),
       n_contrast_factor_(1), defocus_low_limit_(60), defocus_upper_limit_(80),
-      n_defocus_factor_(1), i_d_low_limit_(170), i_d_med_limit_1_(200), i_d_med_limit_2_(350),
+      n_defocus_factor_(1), i_d_low_limit_(160), i_d_med_limit_1_(200), i_d_med_limit_2_(350),
       i_d_upper_limit_(400), n_i_diam_factor_(1), isgs_mean_low_limit_(20),
       isgs_mean_upper_limit_(30), n_isgs_factor_(1), iris_vis_low_limit_(0.4),
       iris_vis_upper_limit_(0.7), ipgs_diff_low_limit_(15), ipgs_diff_upper_limit_(30),
       n_ipgs_diff_factor_(1), n_iris_pupil_ratio_(1),
       iris_pupil_ratio_low_limit_(0.20), iris_pupil_ratio_high_limit_(0.60),
       n_iris_pupil_ratio_factor_(1), n_iris_vis_factor_(1), combined_quality_low_limit_(0),
-      combined_quality_upper_limit_(0.80), overall_quality_(0), min_r_trial_(28),
-      max_r_trial_(42), min_p_r_trial_(8), max_p_r_trial_(32), pupil_cx_(0), pupil_cy_(0),
+      combined_quality_upper_limit_(0.80), overall_quality_(0), min_r_trial_(20),
+      max_r_trial_(54), min_p_r_trial_(8), max_p_r_trial_(32), pupil_cx_(0), pupil_cy_(0),
       pupil_rad_(5), pupil_d_(10), contrast_score_(0),
       overall_margin_(1.0), isgs_diff_mean_avg_(0.0),
       iris_pupil_gs_diff_(0.0), max_point_response_(1000), pupil_circularity_avg_deviation_(0.0),
@@ -31,6 +31,10 @@ MFilter::MFilter()
       n_iso_margin_adequacy_value_(1.0), n_iso_iris_pupil_contrast_value_(1.0), n_iso_iris_pupil_ratio_value_(1.0) ,
       n_iso_ip_concentricity_value_(1.0), n_iso_iris_sclera_contrast_value_(1.0), iso_overall_quality_(100){
 
+//  Updates for 01 March 2023 minor version
+//  Increased max_r_trial from 42 to 54 to allow finding rough iris diameters up to 432 pixels
+//  Decrease min_r_trial from 28 to 20 to allow finding rough iris diameters down to 80 pixels
+  
   cos = new int[101];
 
   isgs_vals_ = new int[256];
@@ -249,7 +253,7 @@ int MFilter::Calc_ISO_Overall_Quality(double n_iso_sharpness_value, double n_iso
     int iso_overall_quality_100 = 0;
 
 
-    iso_overall_quality = n_iso_greyscale_value * n_iso_iris_sclera_contrast_value * n_iso_margin_adequacy_value *
+    iso_overall_quality = n_iso_sharpness_value * n_iso_greyscale_value * n_iso_iris_sclera_contrast_value * n_iso_margin_adequacy_value *
                           n_iso_iris_pupil_contrast_value * n_iso_ip_concentricity_value;
     iso_overall_quality_100 = 100 * iso_overall_quality;
     return iso_overall_quality_100;
@@ -264,7 +268,7 @@ int MFilter::GetQuality(double n_contrast, double n_defocus, double n_iris_d,
       n_margin * n_iris_pupil_ratio * n_iris_pupil_ratio_factor_ *
       n_ipgs_diff * n_ipgs_diff_factor_);
 
-  if (combined_quality_ > combined_quality_low_limit_) {
+  if (combined_quality_ < combined_quality_low_limit_) {
     overall_quality_ = 0;
   }
   if (combined_quality_ >= combined_quality_low_limit_ && combined_quality_ <= combined_quality_upper_limit_) {
@@ -396,7 +400,7 @@ double MFilter::NormalizeIrisDiameter(int iris_d) {
 double MFilter::NormalizeISGS(int isgs_mean) {
   n_isgs_mean_ = 0.0;
   if (isgs_mean < isgs_mean_low_limit_) {
-    n_isgs_mean_ = 0.0; // Revision 2.2 on April 10, 2012
+    n_isgs_mean_ = 0.0; // Revision 2.2
   }
   if (isgs_mean >= isgs_mean_low_limit_ && isgs_mean <= isgs_mean_upper_limit_) {
     n_isgs_mean_ =
@@ -808,9 +812,11 @@ void MFilter::ISOMarginAdequacy(int width, int height) {
   }
 
   double bottom_margin = (height - iris_center_y_ + iris_radius_) / (iris_radius_ * 0.2);
-  if (top_margin < 0) {
-    top_margin = 0;
+  if (bottom_margin < 0) {
+    bottom_margin = 0;
   }
+// March 2023 minor revisions
+// Corrected bottom_margin check logic
 
   iso_margin_adequacy_value_ = left_margin;
   if (right_margin < iso_margin_adequacy_value_) {
@@ -873,6 +879,24 @@ void MFilter::ISOSharpness(const uint8_t *raw_img, const int width, const int he
 
   double power = (double) ss / (double) (width * height);
   iso_sharpness_value_ = 100.0 * ((power * power) / (power * power + c));
+
+
+  // calculate a normalized iso_sharpness
+  // Default to 1.0;
+  n_iso_sharpness_value_ = 1.0;
+  // Set limits for proportional value calculation
+  double lpl_iso_sharpness = 0.0;
+  // Substitute lower proportional limit below for stricter limits
+  double upl_iso_sharpness= 3.0;
+  if (iso_sharpness_value_ < lpl_iso_sharpness){
+    n_iso_sharpness_value_= 0.0;
+  }
+  if (iso_sharpness_value_ >= upl_iso_sharpness){
+    n_iso_sharpness_value_= 1.0;
+  }
+  if (iso_sharpness_value_ >= lpl_iso_sharpness && iso_sharpness_value_ <= upl_iso_sharpness){
+    n_iso_sharpness_value_= (iso_sharpness_value_ - lpl_iso_sharpness)/(upl_iso_sharpness - lpl_iso_sharpness);
+  }
 }
 
 void MFilter::FindIris(const uint8_t *frame_bytes, int width, int height) {
@@ -940,8 +964,10 @@ void MFilter::FindIrisCenter(int **l_edge_vals, int **r_edge_vals, int width,
 
   int best_response = 0;
   for (int r = min_r_trial_; r < max_r_trial_; r++, r++) {
-    for (int i_x = width * 3 / 10; i_x < width * 7 / 10; i_x++, i_x++) {
-      for (int i_y = height * 3 / 10; i_y < height * 7 / 10; i_y++, i_y++) {
+    for (int i_x = width * 1 / 10; i_x < width * 9 / 10; i_x++, i_x++) {
+      for (int i_y = height * 1 / 10; i_y < height * 9 / 10; i_y++, i_y++) {
+// March 2023 minor revisions
+// Increased search space for center of iris to within 10% of the left, right, top, and bottom of the image
         // Version 2.2.1 change initialize dark_iris_center to zero
         int dark_iris_center = 0;
         int trial_response = 0;
@@ -1214,6 +1240,9 @@ void MFilter::FindFineIris(uint8_t **raw_bytes, int width, int height, int rough
   }
 
   isgs_diff_mean_avg_ = isgs_total / (pts_used * 15);
+  if (isgs_diff_mean_avg_< 0) {
+      isgs_diff_mean_avg_ = 0;
+  }
 }
 
 void MFilter::FindPupilCenter(int **edge_v, int width, int height, int iris_center_x,

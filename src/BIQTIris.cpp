@@ -47,17 +47,19 @@ Provider::EvaluationResult BIQTIris::evaluate(const std::string &file) {
       return eval_result;
     }
 
-    if (img.rows < mfo.min_width_ || img.cols < mfo.min_height_) {
+    if (img.cols < mfo.min_width_ || img.rows < mfo.min_height_) {
+      // March 2023 minor revisions
+	  // Changed from if (img.rows < mfo.min_width_ || img.cols < mfo.min_height_) 
       // BIQT Iris has been observed to segfault on images that are very small. This block is intended
       // to prevent that.
       std::cerr << "File '" << file << "' is too small to process ("
-                << img.rows << "x" << img.cols << ")." << std::endl;
+                << img.cols << "x" << img.rows << ")." << std::endl;
       eval_result.errorCode = 1;
       return eval_result;
     }
-    if (img.rows > mfo.max_width_ || img.cols < mfo.max_height_) {
+    if (img.cols > mfo.max_width_ || img.rows > mfo.max_height_) {
       std::cerr << "File '" << file << "' is too large to process ("
-                << img.rows << "x" << img.cols << ")." << std::endl;
+                << img.cols << "x" << img.rows << ")." << std::endl;
       eval_result.errorCode = 2;
       return eval_result;
     }

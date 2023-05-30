@@ -1,7 +1,7 @@
 {
   "name" : "BIQTIris",
-  "description": "Reference iris image quality algorithm limited to 640x480 and 480x480 images.",
-  "version" : "0.3",
+  "description": "A reference iris image quality algorithm including ISO metrics.",
+  "version" : "0.4",
   "sourceLanguage" : "c++",
   "modality": "iris",
   "attributes": [

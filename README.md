@@ -1,8 +1,7 @@
 > NOTICE
 > 
 > This software (or technical data) was produced for the U. S. Government under contract, and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV (DEC 2007)
-> 
-> (C) 2022 The MITRE Corporation. All Rights Reserved.
+> (C) 2023 The MITRE Corporation. All Rights Reserved.
 > Approved for Public Release; Distribution Unlimited. Public Release Case Number 18-0812.
 
 ## Summary ##
@@ -10,8 +9,7 @@
 BIQTIris is a reference library for computing iris image statistics using various quality attributes, features, and ISO metrics. It is
 part of the open-source BIQT Framework.
 
-Support is currently limited to mage files of size 480x480 and 640x480 pixels.
-Raw image data is assumed to have a color depth of 8 bpp.
+Images smaller than 256x256 or larger than 1000x680 are not supported. Raw image data is assumed to have a color depth of 8 bpp.
 
 ### Features ###
 
@@ -21,7 +19,7 @@ The following features are reported by this provider:
 * `image_width` _value range: [256, +inf)_ - Image width measured in pixels.
 * `iris_center_x` _value range: [1, +inf)_ - The x-coordinate of the iris center in the image.
 * `iris_center_y` _value range: [1, +inf)_ - The y-coordinate of the iris center in the image.
-* `iris_diameter` _value range: [224, 336]_ - Raw diameter of the iris measured in pixels.
+* `iris_diameter` _value range: [224, 432]_ - Raw diameter of the iris measured in pixels.
 * `pupil_center_x` _value range: [1, +inf)_ - The x-coordinate of the pupil center in the image.
 * `pupil_center_y` _value range: [1, +inf)_ - The y-coordinate of the pupil center in the image.
 * `pupil_diameter` _value range: [134, 202]_ - Raw diameter of the pupil measured in pixels.
