@@ -91,11 +91,10 @@ class IMAGEOPS_EXPORT MFilter {
   int GetIrisCenterY();
   int GetPupilCenterX();
   int GetPupilCenterY();
-
   int min_width_ = 256;
   int min_height_ = 256;
-  int max_width_ = 640;
-  int max_height_ = 480;
+  int max_width_ = 1000;
+  int max_height_ = 680;
 
  private:
   void CreateImagePointers(int width, int height);
@@ -203,6 +202,7 @@ class IMAGEOPS_EXPORT MFilter {
   double n_iso_iris_pupil_ratio_value_;
   double n_iso_pupil_boundary_circularity_value_;
   double n_iso_greyscale_value_;
+  double n_iso_pupil_iris_contrast_value_;
   double n_iso_ip_concentricity_value_;
   double n_iso_margin_adequacy_value_;
   double n_iso_sharpness_value_;
