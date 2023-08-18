@@ -8,7 +8,7 @@
 # Copyright 2022 The MITRE Corporation. All Rights Reserved.
 # ####################################################################### 
 
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.22)
 project(BIQTIris)
 set(CMAKE_CXX_STANDARD 11)
 
