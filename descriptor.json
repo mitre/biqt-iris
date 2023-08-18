@@ -1,7 +1,7 @@
 {
   "name" : "BIQTIris",
   "description": "A reference iris image quality algorithm including ISO metrics.",
-  "version" : "0.4",
+  "version" : "23.04",
   "sourceLanguage" : "c++",
   "modality": "iris",
   "attributes": [
