@@ -4,14 +4,31 @@
 
 This guide targets Ubuntu 22.04
 
-This provider relies on OpenCV and other core development tools including gcc. These dependencies can be installed from 
-the default apt repository using the following commands:
+This provider relies on OpenCV and other core development tools including gcc. These dependencies can be installed using the following commands:
 
-TODO: Update
+```bash
+sudo apt update
+sudo apt install -y cmake build-essential libopencv-dev
+```
 
 ## Building and Installing
 
-TODO: Update
+Clone the repository.
+
+```bash
+git clone https://github.com/mitre/biqt-iris.git
+cd biqt-iris
+```
+
+Finally, build and install the provider. Set BIQT_HOME via environment variable or using -DBIQT_HOME in cmake command below.
+
+```
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Release ..
+make
+sudo make install
+```
 
 ## Running the Provider
 
