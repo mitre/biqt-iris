@@ -11,12 +11,7 @@
 #ifndef IMAGE_OPS_H
 #define IMAGE_OPS_H
 
-#ifdef _WIN32
-#define IMAGEOPS_EXPORT __declspec(dllexport)
-#include <windows.h>
-#else
 #define IMAGEOPS_EXPORT
-#endif
 
 #define FOCUS_KERNEL_DIM 8
 
